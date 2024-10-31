@@ -12,10 +12,9 @@
 }
 #btbar {
     width: 750px;
+    background-color: purple;
 }
 #gover {
     width: 1000px;
-}
-#ct {
-    text-align: center;
+    background-color: red;
 }
