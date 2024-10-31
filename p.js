@@ -2,6 +2,11 @@ let n = 20;
 
 function create_grid() {
   let prnt = document.getElementsByClassName("prnt")[0];
+  let wd = document.getElementsByTagName("hr")[0].offsetWidth;
+  
+  if(wd <= 8){
+      n = 15;
+  }
   
   for(let i = 1; i <= n * n; i++){
     let new_child = document.createElement("div");

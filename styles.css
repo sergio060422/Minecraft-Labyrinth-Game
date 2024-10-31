@@ -122,3 +122,6 @@ body{
     opacity: 0.1;
   }
 }
+hr {
+    width: 100%;
+}
