@@ -7,5 +7,8 @@
     width: 100px;
     height: 100px;
 }
-
+#btbar {
+    width: 100%;
+    background-color: aliceblue;
+}
 
