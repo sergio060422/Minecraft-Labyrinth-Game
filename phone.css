@@ -2,3 +2,7 @@
     left: 0%;
     transform: translateX(0%);
 }
+.bdir {
+    width: 100px;
+    height: 100px;
+}
