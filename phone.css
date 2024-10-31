@@ -3,6 +3,9 @@
     transform: translateX(0%);
     margin: 50px;
 }
+.proto {
+    width: 22px;
+}
 #btbar {
     width: fit-content;
 }
@@ -13,6 +16,7 @@
 #btbar {
     width: 400px;
     transform: translateX(50%);
+    
 }
 #gover {
     width: 1000px;
