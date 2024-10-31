@@ -3,7 +3,6 @@
   gap: 0px 0px;
   position: relative;
   left: 50%;
-  top: 20px;
   transform: translateX(-50%);
 }
 .proto {
@@ -124,5 +123,5 @@ body{
 }
 hr {
     width: 100%;
-    display: none;
+    visibility: hidden;
 }
