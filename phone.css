@@ -10,6 +10,12 @@
     width: 100px;
     height: 100px;
 }
-#btbar, #gover {
+#btbar {
     width: 750px;
+}
+#gover {
+    width: 1000px;
+}
+#ct {
+    text-align: center;
 }
