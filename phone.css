@@ -3,5 +3,9 @@
     transform: translateX(0%);
 }
 #btbar {
-    width: 800px;
+    width: 700px;
+}
+.bdir {
+    width: 100px;
+    height: 100px;
 }
