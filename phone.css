@@ -1,9 +1,10 @@
 .prnt {
     left: 0%;
     transform: translateX(0%);
+    margin: 50px;
 }
 #btbar {
-    width: 700px;
+    width: fit-content;
 }
 .bdir {
     width: 100px;
