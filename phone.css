@@ -11,10 +11,9 @@
     height: 100px;
 }
 #btbar {
-    width: 500px;
+    width: fit-content;
     background-color: purple;
-    position: absolute;
-    left: 50%;
+    left: 100px;
 }
 #gover {
     width: 1000px;
