@@ -1,14 +1,5 @@
-.prnt {
-    left: 0%;
-    transform: translateX(0%);
-    margin: 20px;
-}
-.bdir {
-    width: 100px;
-    height: 100px;
-}
-#btbar {
-    width: 100%;
-    background-color: aliceblue;
+.proto {
+    height: 60px;
+    width: 60px;
 }
 
