@@ -1,25 +1,11 @@
 .prnt {
     left: 0%;
     transform: translateX(0%);
-    margin: 50px;
-}
-.proto {
-    width: 22px;
-}
-#btbar {
-    width: fit-content;
+    margin: 20px;
 }
 .bdir {
     width: 100px;
     height: 100px;
 }
-#btbar {
-    width: 400px;
-    transform: translateX(50%);
-    
-}
-#gover {
-    width: 1000px;
-    background-color: red;
-    display: block;
-}
+
+
