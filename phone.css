@@ -1,12 +1,12 @@
 .bdir {
-    width: 100px;
-    height: 100px;
+    width: 70px;
+    height: 70px;
 }
 .prnt {
     left: 0%;
     transform: translateX(0%);
 }
 .proto {
-    width: 25px;
-    height: 25px;
+    width: 22px;
+    height: 22px;
 }
