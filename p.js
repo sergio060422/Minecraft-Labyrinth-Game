@@ -5,7 +5,7 @@ function create_grid() {
   let wd = document.getElementsByTagName("hr")[0].offsetWidth;
 
   if(wd <= 800){
-      n = 16;
+      n = 3;
   }
     
   for(let i = 1; i <= n * n; i++){
