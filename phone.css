@@ -1,0 +1,8 @@
+.bdir {
+    width: 100px;
+    height: 100px;
+}
+.prnt {
+    left: 0%;
+    transform: translateX(0%);
+}
