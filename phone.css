@@ -2,4 +2,7 @@
     height: 60px;
     width: 60px;
 }
-
+.prnt {
+    left: 0px;
+    transform: translateX(0px);
+}
