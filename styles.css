@@ -31,17 +31,16 @@ body{
   display: none;
 }
 #btbar{
-  background-color: red;
   text-align: center;
   position: relative;
-  width:fit-content;
+  width: 100%;
   left: 50%;
   top: 10px;
   transform: translateX(-50%);
   padding: 10px;
   border-radius: 10px;
   border-style: solid;
-  background-color: darkslategray;
+
 }
 .bdir{
   width: 150px;
