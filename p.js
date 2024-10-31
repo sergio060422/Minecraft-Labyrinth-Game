@@ -5,7 +5,7 @@ function create_grid() {
   let wd = document.getElementsByTagName("hr")[0].offsetWidth;
   console.log(wd);
   if(wd <= 800){
-      n = 18;
+      n = 16;
   }
   else{
       let btbar = document.getElementById("btbar");
