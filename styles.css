@@ -56,7 +56,7 @@ body{
   transform: translateX(-50%);
   margin-left: 0px;
 }
-.diamond, .epearl {
+.diamond {
   width: 90%;
   animation-name: diamond_rote;
   animation-iteration-count: infinite;
@@ -119,8 +119,7 @@ body{
     opacity: 0.1;
   }
 }
-hr {
+hr{
   visibility: hidden;
   width: 100%;
 }
-

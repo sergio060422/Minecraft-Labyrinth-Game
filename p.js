@@ -2,7 +2,12 @@ let n = 20;
 
 function create_grid() {
   let prnt = document.getElementsByClassName("prnt")[0];
+  let wd = document.getElementsByTagName("hr")[0].offsetWidth;
 
+  if(wd <= 800){
+      n = 16;
+  }
+    
   for(let i = 1; i <= n * n; i++){
     let new_child = document.createElement("div");
     
@@ -23,7 +28,7 @@ function create_grid() {
 
 }
 
-let map = new Map(), cd = new Map();
+let map = new Map();
 
 function gnum(i, j) {
   return (i - 1) * n + j;
@@ -34,8 +39,6 @@ function fill(){
     let a = [2];
     
     for(let j = 1; j <= n; j++){
-      cd[gnum(i, j)] = [i, j];
-        
       if(i % n < 2 || j % n < 2){
         a.push(1);
         let child = document.getElementById(gnum(i, j) + "");
@@ -96,31 +99,12 @@ function dfs(i, j){
   }
 }
 
-let fcell = [];
-
-function rand(){
-    return Number((Math.random() + "").substr(2, 1));
-}
-
-function rem(idc){
-    let r = cd[idc][0], c = cd[idc][1];
-    
-    for(let i = r - 3; i <= r + 3; i++){
-        for(let j = c - 3; j <= c + 3; j++){
-            if(fcell.includes(gnum(i, j))){
-                let pos = fcell.indexOf(gnum(i, j));
-                fcell.splice(pos, 1);
-            }
-        }
-    }
-}
-
 function config_map(){
   let disp = Math.pow((n - 2), 2) + 2;
   
   for(let i = 2; i < n; i++){
     for(let j = 2; j < n; j++){
-      let num = rand() % 2;
+      let num = Number((Math.random() + "").substr(2, 1)) % 2;
       
       if(num){
         disp--;
@@ -130,7 +114,7 @@ function config_map(){
         if(disp != cnt){
           disp++;
           map[i][j] = 0;
-          fcell.push(gnum(i, j));
+        
         }
         else{
           let child = document.getElementById(gnum(i,j) + "");
@@ -140,33 +124,14 @@ function config_map(){
         }
         rstart();
       }
-      else{
-          fcell.push(gnum(i, j));
-      }
     }
   }
-  
-  let epc = Math.floor(Math.random() * 2) + 3; 
-      
-  for(let i = 0; i < epc; i++){
-      let len = fcell.length;
-      let idc = fcell[Math.floor(Math.random() * len)];
-      let cell = document.getElementById(idc + "");
-      let epearl = document.createElement("img");
-      
-      epearl.className = "epearl";
-      epearl.src = "Images/epearl.webp";
-      cell.appendChild(epearl);
-      rem(idc);
-  }
-    
   let end = document.getElementById("2");
   let diamond = document.createElement("img");
-
   diamond.className = "diamond";
   diamond.src = "Images/diamond.png";
   end.appendChild(diamond);
-    
+  
   let child = document.getElementById(n * n - 1 + "");
   child.style.backgroundImage = "url(Images/walk.png)";
   let steve = document.createElement("img");
