@@ -2,12 +2,7 @@ let n = 20;
 
 function create_grid() {
   let prnt = document.getElementsByClassName("prnt")[0];
-  let wd = document.getElementsByTagName("hr")[0].offsetWidth;
 
-  if(wd <= 800){
-      n = 16;
-  }
-    
   for(let i = 1; i <= n * n; i++){
     let new_child = document.createElement("div");
     
@@ -28,7 +23,7 @@ function create_grid() {
 
 }
 
-let map = new Map();
+let map = new Map(), cd = new Map();
 
 function gnum(i, j) {
   return (i - 1) * n + j;
@@ -39,6 +34,8 @@ function fill(){
     let a = [2];
     
     for(let j = 1; j <= n; j++){
+      cd[gnum(i, j)] = [i, j];
+        
       if(i % n < 2 || j % n < 2){
         a.push(1);
         let child = document.getElementById(gnum(i, j) + "");
@@ -99,12 +96,34 @@ function dfs(i, j){
   }
 }
 
+let fcell = [];
+
+function rand(){
+    return Number((Math.random() + "").substr(2, 1));
+}
+
+function rem(idc){
+    let r = cd[idc][0], c = cd[idc][1];
+   
+    for(let i = r - 3; i <= r + 3; i++){
+        for(let j = c - 3; j <= c + 3; j++){
+            if(fcell.includes(gnum(i, j))){
+                let pos = fcell.indexOf(gnum(i, j));
+                fcell.splice(pos, 1);
+            }
+        }
+    }
+}
+
+let eppos =[];
+
 function config_map(){
   let disp = Math.pow((n - 2), 2) + 2;
   
   for(let i = 2; i < n; i++){
     for(let j = 2; j < n; j++){
-      let num = Number((Math.random() + "").substr(2, 1)) % 2;
+      let num = rand() % 2;
+      let idc = gnum(i, j);
       
       if(num){
         disp--;
@@ -114,24 +133,46 @@ function config_map(){
         if(disp != cnt){
           disp++;
           map[i][j] = 0;
-        
+          fcell.push(idc);
         }
         else{
-          let child = document.getElementById(gnum(i,j) + "");
+          let child = document.getElementById(idc + "");
          
           child.style.backgroundImage = "url(Images/wall.png)";
           
         }
         rstart();
       }
+      else{
+          fcell.push(idc);
+      }
     }
   }
+  
+  rem(2);
+  
+  let epc = Math.floor(Math.random() * 2) + 3; 
+      
+  for(let i = 0; i < epc; i++){
+      let len = fcell.length;
+      let idc = fcell[Math.floor(Math.random() * len)];
+      let cell = document.getElementById(idc + "");
+      let epearl = document.createElement("img");
+      
+      epearl.className = "epearl";
+      epearl.src = "Images/epearl.webp";
+      cell.appendChild(epearl);
+      eppos.push(idc);
+      rem(idc);
+  }
+    
   let end = document.getElementById("2");
   let diamond = document.createElement("img");
+
   diamond.className = "diamond";
   diamond.src = "Images/diamond.png";
   end.appendChild(diamond);
-  
+    
   let child = document.getElementById(n * n - 1 + "");
   child.style.backgroundImage = "url(Images/walk.png)";
   let steve = document.createElement("img");
@@ -230,12 +271,53 @@ function move(e){
       col--;
     }
   }
+  let idc = gnum(row, col);
   if(row == 1 && col == 2){
     let end = document.getElementById("2");
     end.removeChild(end.firstChild);
     gameover();
   }
+  else if(eppos.includes(idc)){
+    let cell = document.getElementById(idc + "");
+    cell.removeChild(cell.firstChild);
+    teleport();
+  }
   
+}
+
+function teleport() {
+  let pos = eppos.indexOf(gnum(row, col));
+  eppos.splice(pos, 1);
+  
+  for(let i = row - 3; i <= row + 3; i++){
+    for(let j = col - 3; j <= col + 3; j++){
+      if(ok(i, j) && (i != row || j != col)){
+        let cell = document.getElementById(gnum(i, j) + "");
+        cell.style.backgroundImage = "url(Images/check.png)";
+        cell.addEventListener("click", make_tp);
+      }
+    }
+  }
+}
+
+function make_tp(e){
+  let cell = e.target;
+  let curr = document.getElementById(gnum(row, col ) + "");
+  
+  for (let i = row - 3; i <= row + 3; i++) {
+    for (let j = col - 3; j <= col + 3; j++) {
+      if (ok(i, j)) {
+        let cellp = document.getElementById(gnum(i, j) + "");
+        cellp.style.backgroundImage = "url(Images/walk.png)";
+        cellp.removeEventListener("click", make_tp);
+      }
+    }
+  }
+  let steve = curr.lastChild;
+  curr.removeChild(steve);
+  cell.appendChild(steve);
+  let idc = parseInt(cell.id);
+  row = cd[idc][0], col = cd[idc][1];
 }
 
 function gameover(){

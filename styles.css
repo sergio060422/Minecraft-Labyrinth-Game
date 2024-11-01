@@ -12,6 +12,8 @@
   display: none;
   background-image: url(Images/walk.png);
   background-size: cover;
+  background-color: gray;
+  background-repeat: no-repeat;
   margin: 0px;
   border-style: solid;
   border-color: rgba(255, 255, 255, 0);
@@ -56,7 +58,7 @@ body{
   transform: translateX(-50%);
   margin-left: 0px;
 }
-.diamond {
+.diamond, .epearl {
   width: 90%;
   animation-name: diamond_rote;
   animation-iteration-count: infinite;
@@ -119,7 +121,7 @@ body{
     opacity: 0.1;
   }
 }
-hr{
+hr {
   visibility: hidden;
   width: 100%;
 }
