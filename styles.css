@@ -125,3 +125,25 @@ hr {
   visibility: hidden;
   width: 100%;
 }
+#ifcon{
+  text-align: center;
+  display: none;
+  position: relative;
+  top: 100px;
+  background-color: darkslateblue;
+  border-style: solid;
+  border-radius: 25px;
+  border-width: 15px;
+  padding: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+@font-face {
+  font-family: rbcon;
+  src: url(Fonts/Roboto.ttf);
+}
+p{
+  font-size: 50px;
+  color: white;
+  font-family: rbcon;
+}

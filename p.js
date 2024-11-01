@@ -227,6 +227,9 @@ function config_buttons(){
 let row = n, col = n - 1;
 
 function move(e){
+  if(block_move){
+    return null;
+  }
   let dir = e.target.id;
   let curr = document.getElementById(gnum(row, col) + "");
   let key = String.fromCharCode(e.keyCode);
@@ -285,9 +288,16 @@ function move(e){
   
 }
 
+let block_move = 0;
+
 function teleport() {
   let pos = eppos.indexOf(gnum(row, col));
   eppos.splice(pos, 1);
+  let btbar = document.getElementById("btbar");
+  let ifcon = document.getElementById("ifcon");
+  btbar.style.display = "none";
+  block_move = 1;
+  ifcon.style.display = "block";
   
   for(let i = row - 3; i <= row + 3; i++){
     for(let j = col - 3; j <= col + 3; j++){
@@ -318,6 +328,11 @@ function make_tp(e){
   cell.appendChild(steve);
   let idc = parseInt(cell.id);
   row = cd[idc][0], col = cd[idc][1];
+  let btbar = document.getElementById("btbar");
+  let ifcon = document.getElementById("ifcon");
+  btbar.style.display = "block";
+  block_move = 0;
+  ifcon.style.display = "none";
 }
 
 function gameover(){
