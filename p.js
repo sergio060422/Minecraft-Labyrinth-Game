@@ -1,4 +1,4 @@
-let n = 20;
+let n = 18;
 
 function create_grid() {
   let prnt = document.getElementsByClassName("prnt")[0];
@@ -115,6 +115,50 @@ function rem(idc){
     }
 }
 
+function ok2(i, j){
+  if(i > 1 && i < n && j > 1 && j < n){
+    if(cells.includes(gnum(i, j))){
+      return 1;
+    }
+  }
+  return 0;
+}
+
+function bfs(i, j, di, dj){
+  let q = [];
+  let idc = gnum(i, j), ans, curr;
+  let p = new Map();
+ 
+  p[idc] = idc;
+  q.push([i, j]);
+  
+  while(q.length){
+    let vi = q[0][0], vj = q[0][1];
+    curr = gnum(vi, vj);
+    q.splice(0, 1);
+    if(vi == di && vj == dj){
+     break;
+    }
+    for(let k = 0; k < 4; k++){
+      let ui = vi + mi[k];
+      let uj = vj + mj[k];
+      let gtid = gnum(ui, uj);
+      
+      if(ok2(ui, uj) && p[gtid] == undefined){
+        p[gtid] = curr;
+        q.push([ui, uj]);
+      }
+    }
+  }
+  
+  while(curr != p[curr]){
+    ans = curr;
+    curr = p[curr];
+  }
+  
+  return ans;
+}
+
 let eppos = [], zr = 2, zc = 2;
 let interval;
 
@@ -126,7 +170,7 @@ function add_zombie(idc){
     zombie.src = "Images/zombie.png";
     cell.appendChild(zombie);
     
-    interval = setInterval(zombie_move, 1000);
+    interval = setInterval(zombie_move, 700);
 }
 
 function is_close(){
@@ -138,6 +182,19 @@ function is_close(){
     return 0;
 }
 
+function abs(k){
+  if(k < 0){
+    return k * (-1);
+  }
+  return k;
+}
+
+function Manhattan(x1, y1, x2, y2){
+  return abs(x1 - x2) + abs(y1 - y2);
+}
+
+const cry = new Audio("Audio/zombie_audio.ogg");
+
 function zombie_attack(){
     let cell = document.getElementById(gnum(row, col) + "");
     let zcell = document.getElementById(gnum(zr, zc) + "");
@@ -147,11 +204,14 @@ function zombie_attack(){
     setTimeout(function eat(){
         cell.removeChild(cell.lastChild);
         cell.appendChild(zcell.lastChild);
+        cry.play();
     }, 200);
     setTimeout(function gover(){
         gameover();  
     }, 700);
 }
+
+let fast = 0;
 
 function zombie_move(){
     let fc = []; 
@@ -166,6 +226,21 @@ function zombie_move(){
     }
         
     let goto = fc[Math.floor(Math.random() * fc.length)];
+    
+    if(!frst && Manhattan(zr, zc, row, col) <= 10){
+      goto = bfs(zr, zc, row, col);
+      if(!fast){
+        clearInterval(interval);
+        interval = setInterval(zombie_move, 500);
+        fast = 1;
+      }
+    }
+    else if(fast){
+      clearInterval(interval);
+      interval = setInterval(zombie_move, 700);
+      fast = 0;
+    }
+   
     let gtcell = document.getElementById(goto + "");
     let curr = document.getElementById(gnum(zr, zc) + "");
     let zombie = document.createElement("img");
@@ -193,7 +268,7 @@ function zombie_move(){
     }
 }
 
-
+let cells = [];
 
 function config_map(){
   let disp = Math.pow((n - 2), 2) + 2;
@@ -212,17 +287,18 @@ function config_map(){
           disp++;
           map[i][j] = 0;
           fcell.push(idc);
+          cells.push(idc);
         }
         else{
           let child = document.getElementById(idc + "");
          
           child.style.backgroundImage = "url(Images/wall.png)";
-          
         }
         rstart();
       }
       else{
           fcell.push(idc);
+          cells.push(idc);
       }
     }
   }
@@ -399,10 +475,10 @@ function teleport() {
   btbar.style.display = "none";
   block_move = 1;
   ifcon.style.display = "block";
-  clearInterval(interval, 2000);
+  clearInterval(interval, 700);
     
-  for(let i = row - 3; i <= row + 3; i++){
-    for(let j = col - 3; j <= col + 3; j++){
+  for(let i = row - 2; i <= row + 2; i++){
+    for(let j = col - 2; j <= col + 2; j++){
       if(ok(i, j) && (i != row || j != col)){
         let cell = document.getElementById(gnum(i, j) + "");
         cell.style.backgroundImage = "url(Images/check.png)";
@@ -416,8 +492,8 @@ function make_tp(e){
   let cell = e.target;
   let curr = document.getElementById(gnum(row, col ) + "");
   
-  for (let i = row - 3; i <= row + 3; i++) {
-    for (let j = col - 3; j <= col + 3; j++) {
+  for (let i = row - 2; i <= row + 2; i++) {
+    for (let j = col - 2; j <= col + 2; j++) {
       if (ok(i, j)) {
         let cellp = document.getElementById(gnum(i, j) + "");
         cellp.style.backgroundImage = "url(Images/walk.png)";
@@ -440,7 +516,7 @@ function make_tp(e){
   btbar.style.display = "block";
   block_move = 0;
   ifcon.style.display = "none";
-  interval = setInterval(zombie_move, 2000);
+  interval = setInterval(zombie_move, 700);
 }
 
 function gameover(){
