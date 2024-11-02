@@ -17,12 +17,11 @@
   margin: 0px;
   border-style: solid;
   border-color: rgba(255, 255, 255, 0);
-  
 }
 body{
  background-color: #27272D;
 }
-.steve{
+.steve, .zombie{
   width: 90%;
   height: auto;
   position: relative;
@@ -99,7 +98,6 @@ body{
 #gover {
   display: none;
   color: white;
-  
 }
 #rst {
   font-size: 35px;
@@ -146,4 +144,21 @@ p{
   font-size: 50px;
   color: white;
   font-family: rbcon;
+}
+.zombie {
+   width: 100%; 
+}
+.proto.start {
+    animation-name: wall_appear;
+    animation-duration: 2s;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+}
+@keyframes wall_appear {
+    0% {
+        background-image: url(Images/walk.png);
+    }
+    100% {
+        background-image: url(Images/wall.png);
+    }
 }

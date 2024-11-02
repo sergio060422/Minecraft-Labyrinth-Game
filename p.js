@@ -104,7 +104,7 @@ function rand(){
 
 function rem(idc){
     let r = cd[idc][0], c = cd[idc][1];
-   
+    
     for(let i = r - 3; i <= r + 3; i++){
         for(let j = c - 3; j <= c + 3; j++){
             if(fcell.includes(gnum(i, j))){
@@ -115,11 +115,89 @@ function rem(idc){
     }
 }
 
-let eppos =[];
+let eppos = [], zr = 2, zc = 2;
+let interval;
+
+function add_zombie(idc){
+    let cell = document.getElementById(idc + "");
+    let zombie = document.createElement("img");
+    
+    zombie.className = "zombie";
+    zombie.src = "Images/zombie.png";
+    cell.appendChild(zombie);
+    
+    interval = setInterval(zombie_move, 1000);
+}
+
+function is_close(){
+    for(let i = 0; i < 4; i++){
+        if(zr + mi[i] == row && zc + mj[i] == col){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+function zombie_attack(){
+    let cell = document.getElementById(gnum(row, col) + "");
+    let zcell = document.getElementById(gnum(zr, zc) + "");
+    
+    block_move = 1;
+    clearInterval(interval);
+    setTimeout(function eat(){
+        cell.removeChild(cell.lastChild);
+        cell.appendChild(zcell.lastChild);
+    }, 200);
+    setTimeout(function gover(){
+        gameover();  
+    }, 700);
+}
+
+function zombie_move(){
+    let fc = []; 
+            
+    for(let i = 0; i < 4; i++){
+        let zrp = zr + mi[i];
+        let zcp = zc + mj[i]; 
+            
+        if(ok(zrp, zcp) && zrp > 1){
+            fc.push(gnum(zrp, zcp));
+        }
+    }
+        
+    let goto = fc[Math.floor(Math.random() * fc.length)];
+    let gtcell = document.getElementById(goto + "");
+    let curr = document.getElementById(gnum(zr, zc) + "");
+    let zombie = document.createElement("img");
+    
+    zombie.className = "zombie";
+    zombie.src = "Images/zombie.png";
+    curr.removeChild(curr.lastChild);
+    
+    if(eppos.includes(gnum(zr, zc))){
+        let epearl = document.createElement("img");
+        epearl.src = "Images/epearl.webp";
+        epearl.className = "epearl";
+        curr.appendChild(epearl);   
+    }
+    if(eppos.includes(goto)){
+        gtcell.removeChild(gtcell.lastChild);  
+    }
+
+    map[zr][zc] = 0;
+    zr = cd[goto][0], zc = cd[goto][1];
+    map[zr][zc] = 1;
+    gtcell.appendChild(zombie);    
+    if(is_close(row, col)){
+        zombie_attack();
+    }
+}
+
+
 
 function config_map(){
   let disp = Math.pow((n - 2), 2) + 2;
-  
+    
   for(let i = 2; i < n; i++){
     for(let j = 2; j < n; j++){
       let num = rand() % 2;
@@ -150,8 +228,9 @@ function config_map(){
   }
   
   rem(2);
+  rem(n * n - 1);
   
-  let epc = Math.floor(Math.random() * 2) + 3; 
+  let epc = Math.floor(Math.random() * 2) + 4; 
       
   for(let i = 0; i < epc; i++){
       let len = fcell.length;
@@ -165,42 +244,47 @@ function config_map(){
       eppos.push(idc);
       rem(idc);
   }
-    
+  
+  let zid = fcell[Math.floor(Math.random() * fcell.length)];
   let end = document.getElementById("2");
   let diamond = document.createElement("img");
-
+  
+  zr = cd[zid][0], zc = cd[zid][1];
+  add_zombie(zid);
+    
   diamond.className = "diamond";
   diamond.src = "Images/diamond.png";
   end.appendChild(diamond);
     
   let child = document.getElementById(n * n - 1 + "");
   child.style.backgroundImage = "url(Images/walk.png)";
+  
   let steve = document.createElement("img");
   steve.className= "steve";
   steve.src = "Images/token.png";
   child.appendChild(steve);
   steve.style.display = "block";
   
+  map[n][n - 1] = 1;
+    
   for(let i = 1; i <= n; i++){
     for(let j = 1; j <= n; j++){
       let child = document.getElementById(gnum(i, j) + "");
+      
       if(map[i][j] == 1){
         if(i == 1 || map[i - 1][j]== 0){
-         
           child.style.borderTopWidth = "1px";
           child.style.borderTopColor = "black";
         }
         if(j == n || map[i][j + 1] == 0){
-          
           child.style.borderRightWidth = "1px";
           child.style.borderRightColor = "black";
         }
         if(i == n || map[i + 1][j]== 0){
-          
           child.style.borderBottomWidth = "1px";
           child.style.borderBottomColor = "black";
         }
-        if(j == 1 || map[i][j - 1]== 0){
+        if(j == 1 || map[i][j - 1] == 0){
           child.style.borderLeftWidth = "1px";
           child.style.borderLeftColor = "black";
         }
@@ -209,7 +293,6 @@ function config_map(){
   }
   
   config_buttons();
-  
 }
 
 function config_buttons(){
@@ -224,7 +307,7 @@ function config_buttons(){
   document.addEventListener("keydown", move);
 }
 
-let row = n, col = n - 1;
+let row = n, col = n - 1, frst = 1;
 
 function move(e){
   if(block_move){
@@ -233,8 +316,19 @@ function move(e){
   let dir = e.target.id;
   let curr = document.getElementById(gnum(row, col) + "");
   let key = String.fromCharCode(e.keyCode);
+
+  if(key == "W" || key == "A" || key == "S" || key == "D"){
+      dir = "";
+  }
+  
+  map[row][col] = 0;
     
   if(dir == "up" || key == "W"){
+    if(frst){
+      frst = 0;
+      curr.classList.add("start");
+      map[row][col] = 1;
+    }
     if(ok(row - 1, col)){
       let goto = document.getElementById(gnum(row - 1, col) + "");
       let steve = curr.lastChild;
@@ -244,7 +338,7 @@ function move(e){
       row--;
     }
   }
-  if(dir == "down" || key == "S"){
+  else if(dir == "down" || key == "S"){
     if(ok(row + 1, col)){
       let goto = document.getElementById(gnum(row + 1, col) + "");
       let steve = curr.lastChild;
@@ -254,8 +348,8 @@ function move(e){
       row++;
     }
   }
-  if (dir == "right" || key == "D") {
-    if (ok(row, col + 1)) {
+  else if(dir == "right" || key == "D") {
+    if(ok(row, col + 1)) {
       let goto = document.getElementById(gnum(row, col + 1) + "");
       let steve = curr.lastChild;
   
@@ -264,8 +358,8 @@ function move(e){
       col++;
     }
   }
-  if (dir == "left" || key == "A") {
-    if (ok(row, col - 1)) {
+  else if(dir == "left" || key == "A") {
+    if(ok(row, col - 1)) {
       let goto = document.getElementById(gnum(row, col - 1) + "");
       let steve = curr.lastChild;
   
@@ -274,6 +368,7 @@ function move(e){
       col--;
     }
   }
+  map[row][col] = 1;
   let idc = gnum(row, col);
   if(row == 1 && col == 2){
     let end = document.getElementById("2");
@@ -285,6 +380,11 @@ function move(e){
     cell.removeChild(cell.firstChild);
     teleport();
   }
+  else{
+      if(is_close(row, col)){
+         zombie_attack();
+      }
+  }
   
 }
 
@@ -293,12 +393,14 @@ let block_move = 0;
 function teleport() {
   let pos = eppos.indexOf(gnum(row, col));
   eppos.splice(pos, 1);
+    
   let btbar = document.getElementById("btbar");
   let ifcon = document.getElementById("ifcon");
   btbar.style.display = "none";
   block_move = 1;
   ifcon.style.display = "block";
-  
+  clearInterval(interval, 2000);
+    
   for(let i = row - 3; i <= row + 3; i++){
     for(let j = col - 3; j <= col + 3; j++){
       if(ok(i, j) && (i != row || j != col)){
@@ -327,12 +429,18 @@ function make_tp(e){
   curr.removeChild(steve);
   cell.appendChild(steve);
   let idc = parseInt(cell.id);
+  map[row][col] = 0;
   row = cd[idc][0], col = cd[idc][1];
+  if(is_close(row, col)){
+      zombie_attack();
+  }
+  map[row][col] = 1;
   let btbar = document.getElementById("btbar");
   let ifcon = document.getElementById("ifcon");
   btbar.style.display = "block";
   block_move = 0;
   ifcon.style.display = "none";
+  interval = setInterval(zombie_move, 2000);
 }
 
 function gameover(){
@@ -341,7 +449,8 @@ function gameover(){
   let prnt = document.getElementsByClassName("prnt")[0];
   let btbar = document.getElementById("btbar");
   let rst = document.getElementById("rst");
-
+  
+  clearInterval(interval);
   prnt.style.opacity = btbar.style.opacity = "0.5";
   document.removeEventListener("keydown", move);
   for(let i = 0; i < 4; i++){
