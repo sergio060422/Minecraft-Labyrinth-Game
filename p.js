@@ -124,9 +124,9 @@ function ok2(i, j){
   return 0;
 }
 
-function bfs(i, j, di, dj){
+function bfs(i, j, di, dj, t){
   let q = [];
-  let idc = gnum(i, j), ans, curr;
+  let idc = gnum(i, j), ans = [], curr;
   let p = new Map();
  
   p[idc] = idc;
@@ -152,11 +152,16 @@ function bfs(i, j, di, dj){
   }
   
   while(curr != p[curr]){
-    ans = curr;
+    ans.push(curr);
     curr = p[curr];
   }
   
-  return ans;
+  if(t){
+    return ans[ans.length - 1];
+  }
+  else{
+    return ans;
+  }
 }
 
 let eppos = [], zr = 2, zc = 2;
@@ -194,6 +199,8 @@ function Manhattan(x1, y1, x2, y2){
 }
 
 const cry = new Audio("Audio/zombie_audio.ogg");
+const tp = new Audio("Audio/tp.mp3");
+const bow = new Audio("Audio/arrow.mp3");
 
 function zombie_attack(){
     let cell = document.getElementById(gnum(row, col) + "");
@@ -214,8 +221,10 @@ function zombie_attack(){
 let fast = 0;
 
 function zombie_move(){
+    if(block_move){
+      return;
+    }
     let fc = []; 
-            
     for(let i = 0; i < 4; i++){
         let zrp = zr + mi[i];
         let zcp = zc + mj[i]; 
@@ -228,7 +237,7 @@ function zombie_move(){
     let goto = fc[Math.floor(Math.random() * fc.length)];
     
     if(!frst && Manhattan(zr, zc, row, col) <= 10){
-      goto = bfs(zr, zc, row, col);
+      goto = bfs(zr, zc, row, col, 1);
       if(!fast){
         clearInterval(interval);
         interval = setInterval(zombie_move, 500);
@@ -240,35 +249,210 @@ function zombie_move(){
       interval = setInterval(zombie_move, 700);
       fast = 0;
     }
-   
+    
     let gtcell = document.getElementById(goto + "");
     let curr = document.getElementById(gnum(zr, zc) + "");
-    let zombie = document.createElement("img");
     
-    zombie.className = "zombie";
-    zombie.src = "Images/zombie.png";
-    curr.removeChild(curr.lastChild);
+    for(let i = 0; i < curr.childNodes.length; i++){
+      let node = curr.childNodes.item(i);
+      
+      if(node.className == "zombie"){
+        curr.removeChild(node);
+        gtcell.appendChild(node);
+        break;
+      }
+    }
     
     if(eppos.includes(gnum(zr, zc))){
-        let epearl = document.createElement("img");
-        epearl.src = "Images/epearl.webp";
-        epearl.className = "epearl";
-        curr.appendChild(epearl);   
+        let epearl = curr.firstChild;
+        epearl.style.display = "block";
     }
     if(eppos.includes(goto)){
-        gtcell.removeChild(gtcell.lastChild);  
+        let epearl = gtcell.firstChild;
+        epearl.style.display = "none";
     }
-
+    let zombie = document.getElementsByClassName("zombie")[0];
+    let skeleton = document.getElementsByClassName("skeleton")[0];
+    
+    if(goto == gnum(sr, sc)){
+      skeleton.src = "Images/image.png";
+      zombie.style.display = "none";
+    }
+    else{
+      zombie.style.display= "block";
+      skeleton.style.display = "block";
+      zombie.src = "Images/zombie.png";
+      skeleton.src = "Images/skeleton.png";
+    }
     map[zr][zc] = 0;
     zr = cd[goto][0], zc = cd[goto][1];
     map[zr][zc] = 1;
-    gtcell.appendChild(zombie);    
+    
     if(is_close(row, col)){
         zombie_attack();
     }
 }
 
-let cells = [];
+let cells = [], skc = [], skroute, sr, sc, sgr, sgc;
+
+function add_skeleton(){
+  let del = [];
+    
+  for(let i = 0; i < skc.length; i++){
+      let x = cd[skc[i]][0];
+      let y = cd[skc[i]][1];
+      
+      if(Manhattan(x, y, n, n - 1) <= 10 || (x == zr && y == zc) || eppos.includes(gnum(x, y))){
+          skc.splice(i, 1);
+          del.push(skc[i]);
+      }
+  }
+    
+  let id = skc[Math.floor(Math.random() * skc.length)];
+  let cell = document.getElementById(id + "");
+  let skeleton = document.createElement("img");
+  
+  for(let i = 0; i < del.length; i++){
+      skc.push(del[i]);
+  }
+  
+  skeleton.className = "skeleton";
+  skeleton.src = "Images/skeleton.png";
+  cell.appendChild(skeleton);
+  sr = sgr = cd[id][0];
+  sc = sgc = cd[id][1];
+  skc.splice(skc.indexOf(id), 1);
+  skinterval = setInterval(skeleton_move, 1000);
+}
+
+function is_close_sk(){
+    for(let i = 0; i < 4; i++){
+        for(let j = 1; j <= 4; j++){
+            let currR = sr + mi[i] * j;
+            let currC = sc + mj[i] * j;
+            
+            if(currR == row && currC == col){
+                return j;
+            }
+            if(map[currR][currC] && (currR != zr || currC != zc)){
+                break;
+            }
+        }
+    }
+    return 0;
+}
+
+function skeleton_move(){
+  if(block_move){
+    return;
+  }
+  if(sr == sgr && sc == sgc){
+    let id = skc[Math.floor(Math.random() * skc.length)];
+    skc.push(gnum(sr, sc) + "");
+    sgr = cd[id][0];
+    sgc = cd[id][1];
+    skroute = bfs(sr, sc, sgr, sgc, 0);
+  }
+  let id = skroute[skroute.length - 1];
+  let zid = gnum(zr, zc);
+  
+  skroute.pop();
+  let curr = document.getElementById(gnum(sr, sc) + "");
+  let gt = document.getElementById(id + "");
+  let skeleton = document.getElementsByClassName("skeleton")[0];
+  
+  for(let i = 0; i < curr.childNodes.length; i++){
+      let node = curr.childNodes.item(i);
+      
+      if(node.className == "skeleton"){
+        curr.removeChild(node);
+      }
+  }
+  if(eppos.includes(gnum(sr, sc))){
+      let epearl = curr.firstChild;
+      epearl.style.display = "block";
+  }
+  if(eppos.includes(id)){
+      let epearl = gt.firstChild;
+      epearl.style.display = "none";
+  }
+  
+  let zombie = document.getElementsByClassName("zombie")[0];
+  
+  if (id == gnum(zr, zc)) {
+    skeleton.src = "Images/image.png";
+    zombie.style.display = "none";
+  }
+  else {
+    zombie.style.display = "block";
+    skeleton.style.display = "block";
+    zombie.src = "Images/zombie.png";
+    skeleton.src = "Images/skeleton.png";
+  }
+  
+  sr = cd[id][0];
+  sc = cd[id][1];
+  
+  let icsk = is_close_sk();
+    
+  if(icsk){
+      skeleton_attack(icsk);
+  }
+  gt.appendChild(skeleton);
+}
+
+function skeleton_attack(dis){
+    let curr = document.getElementById(gnum(sr, sc) + "");
+    let arrow = document.createElement("img");
+    arrow.className = "arrow";
+    block_move = 1;
+    clearInterval(interval, 700);
+    clearInterval(interval, 500);
+    clearInterval(skinterval, 1000);
+    bow.play();
+    
+    let d1 = -53 * (dis - 1) - 30;
+    let d2 = 53 * (dis - 1) + 30;
+    
+    if(dis == 1){
+      d1 = -53;
+      d2 = 53;
+    }
+    
+    if(sc == col){
+      if(sr > row){
+        arrow.id = "arrow_up";
+        arrow.src ="Images/up.png";
+        arrow.style.setProperty("--arrow-dis", d1 + "px");
+      }
+      else{
+        arrow.id = "arrow_down";
+        arrow.src ="Images/down.png";
+        arrow.style.setProperty("--arrow-dis", d2 + "px");
+      }
+    }
+    else{
+      if (sc > col) {
+        arrow.id = "arrow_left";
+        arrow.src = "Images/left.png";
+        arrow.style.setProperty("--arrow-dis", d1 + "px");
+      }
+      else {
+        arrow.id = "arrow_right";
+        arrow.src = "Images/right.png";
+        arrow.style.setProperty("--arrow-dis", d2 + "px");
+      }
+    }
+    
+    curr.appendChild(arrow);
+    
+    setTimeout(function f(){
+      let steve = document.getElementById(gnum(row, col) + "").lastChild;
+      steve.classList.add("dsappear");
+      arrow.classList.add("dsappear");
+      gameover();
+    }, 1500);
+}
 
 function config_map(){
   let disp = Math.pow((n - 2), 2) + 2;
@@ -288,6 +472,8 @@ function config_map(){
           map[i][j] = 0;
           fcell.push(idc);
           cells.push(idc);
+          
+          
         }
         else{
           let child = document.getElementById(idc + "");
@@ -299,6 +485,7 @@ function config_map(){
       else{
           fcell.push(idc);
           cells.push(idc);
+          skc.push(idc);
       }
     }
   }
@@ -327,7 +514,8 @@ function config_map(){
   
   zr = cd[zid][0], zc = cd[zid][1];
   add_zombie(zid);
-    
+  add_skeleton();
+  
   diamond.className = "diamond";
   diamond.src = "Images/diamond.png";
   end.appendChild(diamond);
@@ -457,8 +645,13 @@ function move(e){
     teleport();
   }
   else{
+      let icsk = is_close_sk();
+
       if(is_close(row, col)){
          zombie_attack();
+      }
+      else if(icsk){
+          skeleton_attack(icsk);
       }
   }
   
@@ -476,10 +669,11 @@ function teleport() {
   block_move = 1;
   ifcon.style.display = "block";
   clearInterval(interval, 700);
+  clearInterval(skinterval, 1000);
     
   for(let i = row - 2; i <= row + 2; i++){
     for(let j = col - 2; j <= col + 2; j++){
-      if(ok(i, j) && (i != row || j != col)){
+      if(ok(i, j) && (i != row || j != col) && (i != sr || j != sc)){
         let cell = document.getElementById(gnum(i, j) + "");
         cell.style.backgroundImage = "url(Images/check.png)";
         cell.addEventListener("click", make_tp);
@@ -501,44 +695,59 @@ function make_tp(e){
       }
     }
   }
+  tp.play();
   let steve = curr.lastChild;
   curr.removeChild(steve);
   cell.appendChild(steve);
   let idc = parseInt(cell.id);
   map[row][col] = 0;
   row = cd[idc][0], col = cd[idc][1];
+  let icsk = is_close_sk();
+  block_move = 0;
   if(is_close(row, col)){
       zombie_attack();
+  }
+  else if(icsk){
+      block_move = 1;
+     skeleton_attack(icsk);
   }
   map[row][col] = 1;
   let btbar = document.getElementById("btbar");
   let ifcon = document.getElementById("ifcon");
   btbar.style.display = "block";
-  block_move = 0;
   ifcon.style.display = "none";
   interval = setInterval(zombie_move, 700);
+  skinterval = setInterval(skeleton_move, 1000);
 }
 
 function gameover(){
-  let win = document.getElementById("gover");
+  let gover = document.getElementById("gover");
   let bdir = document.getElementsByClassName("bdir");
   let prnt = document.getElementsByClassName("prnt")[0];
   let btbar = document.getElementById("btbar");
   let rst = document.getElementById("rst");
   
   clearInterval(interval);
+  clearInterval(skinterval);
   prnt.style.opacity = btbar.style.opacity = "0.5";
   document.removeEventListener("keydown", move);
-  for(let i = 0; i < 4; i++){
-    bdir[i].removeEventListener("click", move);
+  block_move = 1;
+  let state = document.getElementById("state");
+  if(row == 1){
+    state.classList.add("win");
+    state.textContent = "You Win!";
   }
-  win.style.display = "block";
+  else{
+    state.classList.add("lose");
+    state.textContent = "Game Over";
+  }
+  gover.style.display = "block";
   setTimeout(function f(){
     rst.style.display = "block";
     let body = document.getElementsByTagName("body")[0];
     document.addEventListener("click", rload);
     document.addEventListener("keydown", rload);
-  }, 2100);
+  }, 1600);
  
 }
 

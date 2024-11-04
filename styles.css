@@ -1,3 +1,7 @@
+@font-face {
+  font-family: rbcon;
+  src: url(Fonts/Roboto.ttf);
+}
 .prnt {
   display: inline-grid;
   gap: 0px 0px;
@@ -21,14 +25,18 @@
 body{
  background-color: #27272D;
 }
-.steve, .zombie{
+.steve, .zombie, .skeleton{
   width: 90%;
   height: auto;
   position: relative;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  border-style: solid;
+  border-width: 1px;
 }
+
+
 #proto_steve{
   display: none;
 }
@@ -57,7 +65,7 @@ body{
   transform: translateX(-50%);
   margin-left: 0px;
 }
-.diamond, .epearl {
+.diamond, .epearl{
   width: 90%;
   animation-name: diamond_rote;
   animation-iteration-count: infinite;
@@ -67,6 +75,55 @@ body{
   left: 5%;
   top: 3%;
 }
+:root {
+  --arrow-dis: 0px;
+}
+.arrow {
+  width: auto;
+  position: absolute;
+  height: 50px;
+  z-index: 1;
+  animation-duration: 1.5s;
+  animation-timing-function: linear;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+.skeleton, .steve{
+  z-index: 2;
+}
+#arrow_up, #arrow_down {
+  transform: translateX(17px);
+  animation-name: shoot_y;
+}
+#arrow_left, #arrow_right {
+  transform: translateY(17px);
+  animation-name: shoot_x;
+  width: 50px;
+  height: auto;
+}
+.steve.dsappear{
+  animation-name: stdsap;
+  animation-duration: 2s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-timing-function: linear;
+}
+
+@keyframes stdsap{
+  100%{
+    opacity: 0;
+  }
+}
+@keyframes shoot_y{
+  100%{
+    transform: translate(17px, var(--arrow-dis));
+  }
+}
+@keyframes shoot_x{
+  100%{
+    transform: translate(var(--arrow-dis), 17px);
+  }
+}
 @keyframes diamond_rote{
   0%{
     transform: rotateY(0deg);
@@ -75,17 +132,25 @@ body{
     transform: rotateY(360deg);
   }
 }
-#win{
+#state{
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 80px;
+  font-size: 120%;
   font-style: oblique;
+  font-weight: bold;
   animation-name: appear;
-  animation-duration: 2s;
+  animation-duration: 1.5s;
   animation-timing-function: linear;
   animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+#state.win{
+  color: gold;
+}
+#state.lose{
+  color: white;
 }
 @keyframes appear{
   0%{
@@ -136,16 +201,12 @@ hr {
   left: 50%;
   transform: translateX(-50%);
 }
-@font-face {
-  font-family: rbcon;
-  src: url(Fonts/Roboto.ttf);
-}
 p{
   font-size: 50px;
   color: white;
   font-family: rbcon;
 }
-.zombie {
+.zombie, .skeleton{
    width: 100%; 
 }
 .proto.start {
@@ -162,3 +223,4 @@ p{
         background-image: url(Images/wall.png);
     }
 }
+
