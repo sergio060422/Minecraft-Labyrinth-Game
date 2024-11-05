@@ -42,6 +42,9 @@ function fill(){
         
         if(i != 1 || j != 2){
            child.style.backgroundImage = "url(Images/wall.png)";
+           if(rand() % 2){
+             child.style.backgroundImage ="url(Images/wall2.png";
+           }
         }
       
       }
@@ -202,20 +205,59 @@ const cry = new Audio("Audio/zombie_audio.ogg");
 const tp = new Audio("Audio/tp.mp3");
 const bow = new Audio("Audio/arrow.mp3");
 
+let lifes = 3;
+
+function life_rem(){
+  lifes--;
+  let life_stand = document.getElementById("life_stand");
+  let curr = document.getElementById(gnum(row, col) +"");
+  life_stand.removeChild(life_stand.lastElementChild);
+ 
+  if(lifes){
+    let start = document.getElementById(n * n - 1 + "");
+    let steve = document.createElement("img");
+    
+    map[row][col] = 0;
+    steve.className = "steve";
+    steve.src = "Images/token.png";
+    start.style.backgroundImage = "url(Images/walk.png)";
+    start.classList.remove("start");
+    start.appendChild(steve);
+    if(row != zr || col != zc){
+      curr.removeChild(curr.lastElementChild);
+    }
+    row = n, col = n - 1;
+    frst = 1;
+    block_move = 0;
+  }
+  else{
+    if (row != zr || col != zc) {
+      curr.lastElementChild.classList.add("dsappear");
+    }
+    gameover();
+  }
+}
+
 function zombie_attack(){
+    if(frst){
+      return;
+    }
     let cell = document.getElementById(gnum(row, col) + "");
     let zcell = document.getElementById(gnum(zr, zc) + "");
     
     block_move = 1;
-    clearInterval(interval);
+    map[zr][zc] = 0;
+    zr = row;
+    zc = col;
+    map[zr][zc] = 1;
+    frst = 1;
     setTimeout(function eat(){
         cell.removeChild(cell.lastChild);
         cell.appendChild(zcell.lastChild);
         cry.play();
-    }, 200);
-    setTimeout(function gover(){
-        gameover();  
+        life_rem();
     }, 700);
+    
 }
 
 let fast = 0;
@@ -257,8 +299,11 @@ function zombie_move(){
       let node = curr.childNodes.item(i);
       
       if(node.className == "zombie"){
+        let zombie = document.createElement("img");
+        zombie.src = "Images/zombie.png";
+        zombie.className ="zombie";
+        gtcell.appendChild(zombie);
         curr.removeChild(node);
-        gtcell.appendChild(node);
         break;
       }
     }
@@ -402,13 +447,13 @@ function skeleton_move(){
 }
 
 function skeleton_attack(dis){
+    if(frst){
+      return;
+    }
     let curr = document.getElementById(gnum(sr, sc) + "");
     let arrow = document.createElement("img");
     arrow.className = "arrow";
     block_move = 1;
-    clearInterval(interval, 700);
-    clearInterval(interval, 500);
-    clearInterval(skinterval, 1000);
     bow.play();
     
     let d1 = -53 * (dis - 1) - 30;
@@ -447,10 +492,8 @@ function skeleton_attack(dis){
     curr.appendChild(arrow);
     
     setTimeout(function f(){
-      let steve = document.getElementById(gnum(row, col) + "").lastChild;
-      steve.classList.add("dsappear");
-      arrow.classList.add("dsappear");
-      gameover();
+      curr.removeChild(arrow);
+      life_rem();
     }, 1500);
 }
 
@@ -472,15 +515,20 @@ function config_map(){
           map[i][j] = 0;
           fcell.push(idc);
           cells.push(idc);
+          skc.push(idc);
           let cell = document.getElementById(idc + "");
           cell.style.backgroundImage = "url(Images/walk.png)";
         }
         else{
           let child = document.getElementById(idc + "");
-         
-          child.style.backgroundImage = "url(Images/wall.png)";
-        }
-        rstart();
+          if(rand() % 2){
+            child.style.backgroundImage = "url(Images/wall.png)";
+          }
+          else{
+            child.style.backgroundImage = "url(Images/wall2.png)";
+          }
+       }
+       rstart();
       }
       else{
           fcell.push(idc);
@@ -573,11 +621,12 @@ function config_buttons(){
 }
 
 let row = n, col = n - 1, frst = 1;
-
+let ct = 0;
 function move(e){
-  if(block_move){
+  if(block_move || is_close()){
     return null;
   }
+
   let dir = e.target.id;
   let curr = document.getElementById(gnum(row, col) + "");
   let key = String.fromCharCode(e.keyCode);
@@ -709,7 +758,7 @@ function make_tp(e){
       zombie_attack();
   }
   else if(icsk){
-      block_move = 1;
+     block_move = 1;
      skeleton_attack(icsk);
   }
   map[row][col] = 1;

@@ -35,7 +35,6 @@ body{
   border-width: 1px;
 }
 
-
 #proto_steve{
   display: none;
 }
@@ -44,7 +43,7 @@ body{
   position: relative;
   width:fit-content;
   left: 50%;
-  top: 80px;
+  top: 50px;
   transform: translateX(-50%);
   padding: 10px;
 }
@@ -87,6 +86,7 @@ body{
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
 }
+
 .skeleton, .steve{
   z-index: 2;
 }
@@ -192,11 +192,12 @@ hr {
   display: none;
   position: relative;
   top: 100px;
-  background-color: darkslateblue;
+  background-color: darkorange;
   border-style: solid;
   border-radius: 25px;
   border-width: 15px;
   padding: 20px;
+  padding-top: 0px;
   left: 50%;
   transform: translateX(-50%);
 }
@@ -242,6 +243,7 @@ body{
 }
 #life_stand{
   text-align: center;
+  height: 60px;
 }
 .life {
   display: inline-block;
