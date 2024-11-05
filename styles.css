@@ -7,7 +7,6 @@
   gap: 0px 0px;
   position: relative;
   left: 50%;
-  top: 20px;
   transform: translateX(-50%);
 }
 .proto {
@@ -45,7 +44,7 @@ body{
   position: relative;
   width:fit-content;
   left: 50%;
-  top: 100px;
+  top: 80px;
   transform: translateX(-50%);
   padding: 10px;
 }
@@ -223,4 +222,28 @@ p{
         background-image: url(Images/wall.png);
     }
 }
-
+body{
+  padding: 0px;
+  margin: 0px;
+}
+#hd{
+  height: 100px;
+  background-color: #1C1C22;
+  color: orange;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+}
+#logo{
+  height: 60px;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+#life_stand{
+  text-align: center;
+}
+.life {
+  display: inline-block;
+  height: 60px;
+}

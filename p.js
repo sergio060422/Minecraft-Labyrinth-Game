@@ -456,7 +456,7 @@ function skeleton_attack(dis){
 
 function config_map(){
   let disp = Math.pow((n - 2), 2) + 2;
-    
+  
   for(let i = 2; i < n; i++){
     for(let j = 2; j < n; j++){
       let num = rand() % 2;
@@ -472,8 +472,8 @@ function config_map(){
           map[i][j] = 0;
           fcell.push(idc);
           cells.push(idc);
-          
-          
+          let cell = document.getElementById(idc + "");
+          cell.style.backgroundImage = "url(Images/walk.png)";
         }
         else{
           let child = document.getElementById(idc + "");
@@ -539,6 +539,7 @@ function config_map(){
         if(i == 1 || map[i - 1][j]== 0){
           child.style.borderTopWidth = "1px";
           child.style.borderTopColor = "black";
+         
         }
         if(j == n || map[i][j + 1] == 0){
           child.style.borderRightWidth = "1px";
