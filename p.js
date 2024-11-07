@@ -1055,7 +1055,7 @@ function start(e){
       canvas2.lineCap = "round";
     
       canvas2.beginPath();
-      canvas2.arc(90, 90, 85, 0, rad);
+      canvas2.arc(90, 90, 80, 0, rad);
       canvas2.stroke();
       
       t2++;
