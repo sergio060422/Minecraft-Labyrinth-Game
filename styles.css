@@ -43,25 +43,43 @@ body{
   position: relative;
   width:fit-content;
   left: 50%;
-  top: 50px;
+  top: 20px;
   transform: translateX(-50%);
   padding: 10px;
 }
-.bdir{
-  width: 200px;
-  height: 200px;
+.bdir, #craft{
+  width: 180px;
+  height: 180px;
   border-radius: 30px;
   background-size: cover;
   display: inline-block;
   margin: 10px;
   touch-action: manipulation;
+  border-style: solid;
+  border-width: 2px;
+  border-color: black;
 }
-#up{
+#up, #down{
   display: block;
   position: relative;
   left: 50%;
   transform: translateX(-50%);
   margin-left: 0px;
+}
+#left, #right{
+  transform: translateY(8px);
+}
+
+#craft{
+  width: 200px;
+  height: 200px;
+  background-color: orangered;
+  background-image: url(Images/craft.png);
+  background-size: 80% 80%;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  border-width: 5px;
+  
 }
 .diamond, .epearl{
   width: 90%;
@@ -187,7 +205,7 @@ hr {
   visibility: hidden;
   width: 100%;
 }
-#ifcon{
+#ifcon, #cftcon{
   text-align: center;
   display: none;
   position: relative;
@@ -248,4 +266,23 @@ body{
 .life {
   display: inline-block;
   height: 60px;
+}
+#canvas_container{
+  position: relative;
+  width: 90%;
+  height: 90%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+#cv{
+  transform: rotate(-90deg);
+}
+.cft{
+  width: 46px;
+  height: 46px;
+  transform: rotate(-90deg);
+  border-style: dashed;
+  border-color: white;
+  border-width: 3px;
 }

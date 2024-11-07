@@ -212,11 +212,16 @@ function life_rem(){
   let life_stand = document.getElementById("life_stand");
   let curr = document.getElementById(gnum(row, col) +"");
   life_stand.removeChild(life_stand.lastElementChild);
- 
+  if(sele){
+    sele = 0;
+    remsel(row, col);
+    remchild(cell);
+    end();
+  }
   if(lifes){
     let start = document.getElementById(n * n - 1 + "");
     let steve = document.createElement("img");
-    
+
     map[row][col] = 0;
     steve.className = "steve";
     steve.src = "Images/token.png";
@@ -256,7 +261,7 @@ function zombie_attack(){
         cell.appendChild(zcell.lastChild);
         cry.play();
         life_rem();
-    }, 700);
+    }, 500);
     
 }
 
@@ -379,7 +384,7 @@ function is_close_sk(){
             if(currR == row && currC == col){
                 return j;
             }
-            if(map[currR][currC] && (currR != zr || currC != zc)){
+            if(block[gnum(currR, currC)] && (currR != zr || currC != zc)){
                 break;
             }
         }
@@ -398,9 +403,11 @@ function skeleton_move(){
     sgc = cd[id][1];
     skroute = bfs(sr, sc, sgr, sgc, 0);
   }
+  if(!skroute.length){
+    return;
+  }
   let id = skroute[skroute.length - 1];
   let zid = gnum(zr, zc);
-  
   skroute.pop();
   let curr = document.getElementById(gnum(sr, sc) + "");
   let gt = document.getElementById(id + "");
@@ -411,6 +418,7 @@ function skeleton_move(){
       
       if(node.className == "skeleton"){
         curr.removeChild(node);
+        break;
       }
   }
   if(eppos.includes(gnum(sr, sc))){
@@ -497,6 +505,8 @@ function skeleton_attack(dis){
     }, 1500);
 }
 
+let block = new Map();
+
 function config_map(){
   let disp = Math.pow((n - 2), 2) + 2;
   
@@ -521,11 +531,14 @@ function config_map(){
         }
         else{
           let child = document.getElementById(idc + "");
+       
           if(rand() % 2){
             child.style.backgroundImage = "url(Images/wall.png)";
+            block[idc] = 1;
           }
           else{
             child.style.backgroundImage = "url(Images/wall2.png)";
+            block[idc] = 2;
           }
        }
        rstart();
@@ -636,7 +649,8 @@ function move(e){
   }
   
   map[row][col] = 0;
-    
+  let ar = row, ac = col;
+  
   if(dir == "up" || key == "W"){
     if(frst){
       frst = 0;
@@ -682,6 +696,15 @@ function move(e){
       col--;
     }
   }
+
+  if(row != ar || col != ac){
+      remsel(ar, ac);
+      if (sele) {
+        sele = 0;
+        remchild(cell);
+        cell = 0;
+      }
+  }
   map[row][col] = 1;
   let idc = gnum(row, col);
   if(row == 1 && col == 2){
@@ -703,8 +726,36 @@ function move(e){
       else if(icsk){
           skeleton_attack(icsk);
       }
+      else if(!tuto){
+          addsel(row, col);
+      }
   }
-  
+}
+
+function addsel(r, c){
+   for (let i = 0; i < 4; i++) {
+     let ip = r + mi[i];
+     let jp = c + mj[i];
+     let idc = gnum(ip, jp);
+     let cell = document.getElementById(idc + "");
+   
+     if (block[idc]) {
+       cell.addEventListener("click", select);
+     }
+   }
+}
+
+function remsel(r, c){
+   for (let i = 0; i < 4; i++) {
+     let ip = r + mi[i];
+     let jp = c + mj[i];
+     let idc = gnum(ip, jp);
+   
+     if (block[idc]) {
+       let cellp = document.getElementById(idc + "");
+       cellp.removeEventListener("click", select);
+     }
+   }
 }
 
 let block_move = 0;
@@ -761,6 +812,9 @@ function make_tp(e){
      block_move = 1;
      skeleton_attack(icsk);
   }
+  else{
+    addsel(row, col);
+  }
   map[row][col] = 1;
   let btbar = document.getElementById("btbar");
   let ifcon = document.getElementById("ifcon");
@@ -805,5 +859,209 @@ function rload(){
   location.reload();
 }
 
+let t = 10, t2 = 10, inter1, inter2, kt = 0.0175, sele = 0, cv;
 
+function remchild(node){
+  for(let i = node.childNodes.length - 1; i >= 0; i--){
+    node.removeChild(node.lastChild);
+  }
+}
+
+function add(){
+  let cvc = document.getElementById("canvas_container");
+  cvb = document.getElementById("cvb");
+  
+  cvc.addEventListener("touchstart", start);
+  cvc.addEventListener("touchend", end);
+}
+
+function end(e){
+  clearInterval(inter1);
+  clearInterval(inter2);
+  stop();
+  
+  let canvas = cvb.getContext("2d");
+  canvas.clearRect(0, 0, 50, 50);
+  element = document.getElementById("cv");
+  canvas = element.getContext("2d");
+  canvas.clearRect(0, 0, 180, 180);
+  t = 0;
+  t2 = 0;
+}
+
+let cell = 0;
+
+function select(e){
+  let tg = e.target;
+  
+  if(tg == cell || tg.className != "proto"){
+    return;
+  }
+  else{
+    cell = tg;
+  }
+  let cft = document.createElement("div");
+  
+  if(tuto){
+    tuto = block_move = 0;
+    let cftcon = document.getElementById("cftcon");
+    let btbar = document.getElementById("btbar");
+   
+    btbar.style.display = "block";
+    cftcon.style.display = "none";
+  }
+  cft.className = "cft";
+  cell.appendChild(cft);
+  sele = 1;
+  
+  for(let i = 0; i < 4; i++){
+    let ip = row + mi[i];
+    let jp = col + mj[i];
+    let b = block[gnum(ip, jp)];
+    let cell2 = document.getElementById(gnum(ip, jp) + "");
+    
+    if(cell2 != cell && b){
+      remchild(cell2);
+    }
+    if(b){
+      if(b == 1){
+        cell2.style.backgroundImage = "url(Images/wall.png)";
+      }
+      else{
+        cell2.style.backgroundImage = "url(Images/wall2.png)";
+      }
+    }
+  }
+}
+
+let tuto = 1;
+let breaking= new Audio("Audio/breaking.mp3");
+let broke = new Audio("Audio/broke.mp3");
+
+function stop(){
+  breaking.pause();
+  breaking.currentTime = 0;
+}
+
+function start(e){
+  let element = document.getElementById("cv");
+  let canvas = element.getContext("2d");
+  
+  if(tuto){
+      let ok = 0;
+      
+      for(let i = 0; i < 4; i++){
+         let ip = row + mi[i];
+         let jp = col + mj[i];
+         let id = gnum(ip, jp);
+         let cell2 = document.getElementById(id + "");
+         
+         if(block[id]){
+           ok = 1;
+           
+           cell2.style.backgroundImage = "url(Images/check.png)";
+           cell2.addEventListener("click", select);
+          }
+      }
+      if(ok){
+        let btbar = document.getElementById("btbar");
+        let cftcon = document.getElementById("cftcon");
+        
+        block_move = 1;
+        btbar.style.display = "none";
+        cftcon.style.display = "block";
+      }
+
+  }
+  if(sele){
+    let cft = cell.firstChild;
+    let canvas = cvb.getContext("2d");
+    cft.appendChild(cvb);
+    breaking.play();
+   
+    inter1 = setInterval(function f() {
+      let p = t * 100 / 300;
+      let rad = p * 360 / 100 * kt;
+    
+      canvas.lineWidth = 3;
+      canvas.strokeStyle = "lightcyan";
+      canvas.lineCap = "round";
+    
+      canvas.beginPath();
+      canvas.arc(23, 23, 17, 0, rad);
+      canvas.stroke();
+      
+      t++;
+      if (t > 300) {
+        stop();
+        broke.play();
+        end();
+        sele = 0;
+        remchild(cell);
+        let idc = parseInt(cell.id);
+        let i = cd[idc][0];
+        let j = cd[idc][1];
+        block[idc] = 0;
+        cell.style.backgroundImage = "url(Images/walk.png)";
+        for(let k = 0; k < 4; k++){
+          let ip = i + mi[k];
+          let jp = j + mj[k];
+          let idp = gnum(ip, jp);
+          let child = document.getElementById(idp + "")
+          
+          if(block[idp] || ip == n || jp == n){
+            if(k == 0){
+               child.style.borderLeftWidth = "1px";
+               child.style.borderLeftColor = "black";
+            }
+            if(k == 1){
+               child.style.borderTopWidth = "1px";
+               child.style.borderTopColor = "black";
+            }
+            if(k == 2){
+               child.style.borderRightWidth = "1px";
+               child.style.borderRightColor = "black";
+            }
+            if(k == 3){
+               child.style.borderBottomWidth = "1px";
+               child.style.borderBottomColor = "black";
+            }
+          }
+        }
+        cell.style.borderStyle = "solid";
+        cell.style.borderColor = "rgba(255, 255, 255, 0)";
+        cell.style.borderWidth = "1.5px";
+        cell.removeEventListener("click", select);
+        skc.push(idc);
+        fcell.push(idc);
+        cells.push(idc);
+        map[i][j] = 0;
+        let icsk = is_close_sk();
+        if(icsk){
+          skeleton_attack(icsk);
+        }
+      }
+    }, 10);
+    
+    let cv = document.getElementById("cv");
+    let canvas2 = cv.getContext("2d");
+    
+    inter2 = setInterval(function f() {
+      let p = t * 100 / 300;
+      let rad = p * 360 / 100 * kt;
+    
+      canvas2.lineWidth = 12;
+      canvas2.strokeStyle = "lightcyan";
+      canvas2.lineCap = "round";
+    
+      canvas2.beginPath();
+      canvas2.arc(90, 90, 85, 0, rad);
+      canvas2.stroke();
+      
+      t2++;
+    }, 10);
+  }
+}
+
+window.addEventListener("load", add);
 window.addEventListener("load", create_grid); 
